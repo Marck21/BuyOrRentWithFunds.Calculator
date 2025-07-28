@@ -333,10 +333,12 @@
                 calculated.ValorRestanteEnBolsa = valorRestanteEnBolsaAnual;
                 calculated.CosteImpuestosPlusvaliasRestante = impuestosRestanteAnual;
                 calculated.RetornoTotalInmobiliaria = retornoTotalInmobiliariaAnual;
+                calculated.FlujoCajaMensualInmobiliaria = (ingresosAlquilerAnuales - pagosHipotecaAcumulados) / (inputs.AnosInversion > 0 ? inputs.AnosInversion * 12 : 1);
 
                 calculated.ValorCarteraBolsa = valorCarteraCompletaAnual;
                 calculated.CosteImpuestosPlusvalias = impuestosCarteraCompleta;
                 calculated.RetornoTotalBolsa = retornoTotalBolsaAnual;
+                calculated.FlujoCajaMensualBolsa = (retornoTotalBolsaAnual - inputs.InversionInicial) / (inputs.AnosInversion > 0 ? inputs.AnosInversion * 12 : 1);
 
                 calculated.DiferenciaRetornoTotal = calculated.RetornoTotalBolsa - calculated.RetornoTotalInmobiliaria;
             }

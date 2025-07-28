@@ -6,15 +6,16 @@
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+        @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
+            <MudIcon Icon="@Icons.Material.Filled.Wallet" />
+        <MudText Typo="Typo.h5" Class="ml-3">Buy or Rent With Investment Funds </MudText>
         <MudSpacer />
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        @* <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" /> *@
     </MudAppBar>
-    <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+@*     <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
-    </MudDrawer>
+    </MudDrawer> *@
     <MudMainContent Class="pt-16 pa-4">
         @Body
     </MudMainContent>
@@ -28,7 +29,7 @@
 </div>
 
 @code {
-    private bool _drawerOpen = true;
+    private bool _drawerOpen = false;
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
 

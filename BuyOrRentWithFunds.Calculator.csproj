@@ -7,6 +7,10 @@
 		<InvariantGlobalization>false</InvariantGlobalization>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)'!='Debug'">
+		<BlazorWasmAppBasePath>/BuyOrRentWithFunds.Calculator/</BlazorWasmAppBasePath>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.6" />
