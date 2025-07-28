@@ -1,10 +1,10 @@
 {
   "mainAssemblyName": "BuyOrRentWithFunds.Calculator",
   "resources": {
-    "hash": "sha256-JSTidYlz0cmab1tDnTE23Z6XykEn2EPOexHV3EosWog=",
+    "hash": "sha256-zAxqRrZjtrmo51UOica40dYqs98FjGZF+EdzZV77vvM=",
     "fingerprinting": {
       "Blazored.LocalStorage.12n6dz54qr.wasm": "Blazored.LocalStorage.wasm",
-      "Microsoft.AspNetCore.Components.mo0ohf0fq5.wasm": "Microsoft.AspNetCore.Components.wasm",
+      "Microsoft.AspNetCore.Components.l51t3ywjli.wasm": "Microsoft.AspNetCore.Components.wasm",
       "Microsoft.AspNetCore.Components.Forms.3fizxrs11t.wasm": "Microsoft.AspNetCore.Components.Forms.wasm",
       "Microsoft.AspNetCore.Components.Web.mp0zu096h0.wasm": "Microsoft.AspNetCore.Components.Web.wasm",
       "Microsoft.AspNetCore.Components.WebAssembly.615skuxmvs.wasm": "Microsoft.AspNetCore.Components.WebAssembly.wasm",
@@ -21,7 +21,7 @@
       "Microsoft.Extensions.Primitives.ivrbo4p2mr.wasm": "Microsoft.Extensions.Primitives.wasm",
       "Microsoft.JSInterop.pjv2y7r5d5.wasm": "Microsoft.JSInterop.wasm",
       "Microsoft.JSInterop.WebAssembly.ynpjm7kaw7.wasm": "Microsoft.JSInterop.WebAssembly.wasm",
-      "MudBlazor.auj3vpv2xa.wasm": "MudBlazor.wasm",
+      "MudBlazor.40dhtioty9.wasm": "MudBlazor.wasm",
       "System.Collections.Concurrent.kt18xq7grs.wasm": "System.Collections.Concurrent.wasm",
       "System.Collections.Immutable.cqwxwa3egg.wasm": "System.Collections.Immutable.wasm",
       "System.Collections.t1rmi6gqzh.wasm": "System.Collections.wasm",
@@ -45,8 +45,8 @@
       "System.Text.RegularExpressions.l4zygcoxoc.wasm": "System.Text.RegularExpressions.wasm",
       "System.Threading.acwnquwc9t.wasm": "System.Threading.wasm",
       "System.wznexm8bk2.wasm": "System.wasm",
-      "System.Private.CoreLib.06a3apne88.wasm": "System.Private.CoreLib.wasm",
-      "BuyOrRentWithFunds.Calculator.nxaw9l72f4.wasm": "BuyOrRentWithFunds.Calculator.wasm",
+      "System.Private.CoreLib.e2g8tfm8tw.wasm": "System.Private.CoreLib.wasm",
+      "BuyOrRentWithFunds.Calculator.s6w54yta0z.wasm": "BuyOrRentWithFunds.Calculator.wasm",
       "dotnet.js": "dotnet.js",
       "dotnet.native.st0ovrfdhi.js": "dotnet.native.js",
       "dotnet.native.67rumul467.wasm": "dotnet.native.wasm",
@@ -71,11 +71,11 @@
     },
     "coreAssembly": {
       "System.Runtime.InteropServices.JavaScript.6schwq2dnb.wasm": "sha256-Cn3AWL5RRx/+wSaM3zP5OMUrHBNZJL2qjoFMxP5C9Jk=",
-      "System.Private.CoreLib.06a3apne88.wasm": "sha256-yGv5gk5kWI3AaT1dmRghHi5dI5rTaxr0QKHJ6JnwrAU="
+      "System.Private.CoreLib.e2g8tfm8tw.wasm": "sha256-VjynRD6JLlBwC5u9AgJgCwVXJDr73aUIBokrznA+R6E="
     },
     "assembly": {
       "Blazored.LocalStorage.12n6dz54qr.wasm": "sha256-OaMAAd5n7ORfyur5e3QIyEVKJ76MKIvwbg7/icnnYcU=",
-      "Microsoft.AspNetCore.Components.mo0ohf0fq5.wasm": "sha256-diYIV0isPSwQ7Ze25lvBUZ5KczF4YNd5bPK5gpGyslI=",
+      "Microsoft.AspNetCore.Components.l51t3ywjli.wasm": "sha256-GRYZocU+w795r3HNpchLPVTV92wiGloroOwJm0g17UI=",
       "Microsoft.AspNetCore.Components.Forms.3fizxrs11t.wasm": "sha256-/1TfBt/IOdk6vrNxUX8feUS6zNpQcpB7yORLmurmfsE=",
       "Microsoft.AspNetCore.Components.Web.mp0zu096h0.wasm": "sha256-piPICyhwidGn2TdrH1aU8js47WfLHIki6OgQyuPwAU4=",
       "Microsoft.AspNetCore.Components.WebAssembly.615skuxmvs.wasm": "sha256-emRN3lp6pyAQiza+BhM5+WtNZKLHizh8b6Ogkazmigg=",
@@ -92,7 +92,7 @@
       "Microsoft.Extensions.Primitives.ivrbo4p2mr.wasm": "sha256-IuaenpYMh7L1lBxF0ipi4BqLJIarq8zPH49edWgK8H0=",
       "Microsoft.JSInterop.pjv2y7r5d5.wasm": "sha256-NdoCzcdyiZ5MAEJcrbj4AkVwXQWY0PoMCYFTdFBbFmM=",
       "Microsoft.JSInterop.WebAssembly.ynpjm7kaw7.wasm": "sha256-rhpkBOcrE3Jka5EriY0f6+d/lxnwAWpcDQrLBwRBYfg=",
-      "MudBlazor.auj3vpv2xa.wasm": "sha256-Mnr/ViTkW4U7Jf3EMev+EeboMJlKx7Tyq3a2w+YlQUk=",
+      "MudBlazor.40dhtioty9.wasm": "sha256-7B6QxJyCfqmI5hrGIwT98x1tE3Hbv1Te1jtAcpIFZqU=",
       "System.Collections.Concurrent.kt18xq7grs.wasm": "sha256-OJTAOih+Xws1Ks/irBSpyqvH1AJfyw/eJIhzDslWjL8=",
       "System.Collections.Immutable.cqwxwa3egg.wasm": "sha256-9FsbM4di/SVUraXCQOCPXPH1b06VMvKoyWl7UHybgEw=",
       "System.Collections.t1rmi6gqzh.wasm": "sha256-cdzn0Z+iPQU5Tt0xIwKDvsPopsh3YLTNMmZjTQ2jb9k=",
@@ -115,7 +115,7 @@
       "System.Text.RegularExpressions.l4zygcoxoc.wasm": "sha256-q5lltgMalFOv4po5bY40QLihW8tUtXalq2+vOTkVNZI=",
       "System.Threading.acwnquwc9t.wasm": "sha256-hmq7E5RBDuX9WHoN8bZjejvmxHmSFsAk0rO4O+E/LOg=",
       "System.wznexm8bk2.wasm": "sha256-/Imz/Enqa2AZc4T3k/CqtsM6674KRN9OUtvK4Nokhew=",
-      "BuyOrRentWithFunds.Calculator.nxaw9l72f4.wasm": "sha256-WwwC7P/jHc4hobW3MOOj5LMr69fNRMqs9nkWZr0qhUI="
+      "BuyOrRentWithFunds.Calculator.s6w54yta0z.wasm": "sha256-zDGMWKiWZIWuwhFsHEDDxSCAurdyTP7bBMLbfwXFNr8="
     }
   },
   "cacheBootResources": true,
