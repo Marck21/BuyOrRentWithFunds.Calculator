@@ -1,0 +1,476 @@
+﻿@page "/"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<MudThemeProvider />
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
+    <MudGrid Spacing="4">
+
+        <MudItem xs="12" md="5">
+            <MudPaper Class="pa-4" Elevation="3">
+                <MudText Typo="Typo.h5" GutterBottom="true">Datos de Inversión</MudText>
+
+                <MudTabs Elevation="2" Rounded="true" PanelClass="mt-4">
+                    <MudTabPanel Text="General">
+                        <MudNumericField @bind-Value="inputs.InversionInicial" @bind-Value:after="() => RecalculateAndSave()" Label="Inversión Inicial" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Euro" HelperText="Cantidad inicial para invertir." />
+                        <MudSlider @bind-Value="inputs.InversionInicial" @bind-Value:after="() => RecalculateAndSave()" Min="1000" Max="250000" Step="1000" Class="my-4" />
+                        <MudNumericField @bind-Value="inputs.AnosInversion" @bind-Value:after="() => RecalculateAndSave()" Label="Años de Inversión" Variant="Variant.Outlined" />
+                        <MudSlider @bind-Value="inputs.AnosInversion" @bind-Value:after="() => RecalculateAndSave()" Min="1" Max="50" Class="my-4" />
+                        <MudNumericField @bind-Value="inputs.EdadActual" @bind-Value:after="() => RecalculateAndSave()" Label="Edad Actual" Variant="Variant.Outlined" />
+                        <MudNumericField @bind-Value="inputs.AlquilerMensualAlternativo" @bind-Value:after="() => RecalculateAndSave()" Label="Alquiler Mensual (si no compras)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Euro" />
+                        <MudSlider @bind-Value="inputs.AlquilerMensualAlternativo" @bind-Value:after="() => RecalculateAndSave()" Min="100" Max="2000" Step="1" Class="my-4" />
+                        <MudNumericField @bind-Value="inputs.CrecimientoAnualAlquiler" @bind-Value:after="() => RecalculateAndSave()" Label="Tasa Crecimiento Anual Alquiler (%)" Variant="Variant.Outlined" Format="F2" />
+                        <MudSlider @bind-Value="inputs.CrecimientoAnualAlquiler" @bind-Value:after="() => RecalculateAndSave()" Min="0.00" Max="10.00" Step="0.25" Class="my-4" />
+                        <MudNumericField T="decimal" Value="calculated.TotalGastosAlquiler" Label="Gastos Totales de Alquiler (Informativo)" ReadOnly="true" Variant="Variant.Filled" Format="C0" Culture="es" />
+
+                        <MudExpansionPanels MultiExpansion="true" Class="mt-4">
+                            <MudExpansionPanel Text="Tramos IRPF para Plusvalías (Base del Ahorro)">
+                                <MudSimpleTable Dense="true" Class="mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th>Beneficios</th>
+                                            <th style="text-align: right;">Impuesto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Hasta 6.000 €</td><td style="text-align: right;">19%</td></tr>
+                                        <tr><td>Entre 6.000 € y 50.000 €</td><td style="text-align: right;">21%</td></tr>
+                                        <tr><td>Entre 50.000 € y 200.000 €</td><td style="text-align: right;">23%</td></tr>
+                                        <tr><td>Entre 200.000 € y 300.000 €</td><td style="text-align: right;">27%</td></tr>
+                                        <tr><td>A partir de 300.000 €</td><td style="text-align: right;">28%</td></tr>
+                                    </tbody>
+                                </MudSimpleTable>
+                            </MudExpansionPanel>
+                        </MudExpansionPanels>
+                    </MudTabPanel>
+
+                    <MudTabPanel Text="Inmobiliaria">
+                        <MudCheckBox @bind-Value="inputs.UsarInversionInicialParaEntrada" @bind-Value:after="() => RecalculateAndSave()" Label="Usar Inversión Inicial como Entrada" Class="mb-2" />
+                        <MudNumericField @bind-Value="inputs.Entrada" @bind-Value:after="() => RecalculateAndSave()" Label="Entrada" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Euro" Disabled="inputs.UsarInversionInicialParaEntrada" />
+                        <MudSlider @bind-Value="inputs.Entrada" @bind-Value:after="() => RecalculateAndSave()" Min="10000" Max="250000" Class="my-4" Disabled="inputs.UsarInversionInicialParaEntrada" />
+                        <div class="my-2">
+                            <MudButtonGroup Variant="Variant.Outlined" FullWidth="true" OverrideStyles="false">
+                                <MudButton OnClick="@(() => SetDownPaymentPercentage(0.10m))">10%</MudButton>
+                                <MudButton OnClick="@(() => SetDownPaymentPercentage(0.20m))">20%</MudButton>
+                                <MudButton OnClick="@(() => SetDownPaymentPercentage(0.30m))">30%</MudButton>
+                            </MudButtonGroup>
+                        </div>
+                        <MudAlert Severity="@calculated.DownPaymentWarningSeverity" ShowCloseIcon="false" Class="mb-4" Dense="true" Hidden="@(string.IsNullOrEmpty(calculated.DownPaymentWarningMessage))">
+                            @calculated.DownPaymentWarningMessage
+                        </MudAlert>
+                        <MudNumericField @bind-Value="inputs.PrecioVivienda" @bind-Value:after="() => RecalculateAndSave()" Label="Precio de la Vivienda" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Euro" />
+                        <MudSlider @bind-Value="inputs.PrecioVivienda" @bind-Value:after="() => RecalculateAndSave()" Min="50000" Max="1000000" Step="1000" Class="my-4" />
+                        <MudNumericField @bind-Value="inputs.CrecimientoAnualVivienda" @bind-Value:after="() => RecalculateAndSave()" Label="Tasa Crecimiento Anual Vivienda (%)" Variant="Variant.Outlined" Format="F2" />
+                        <MudSlider @bind-Value="inputs.CrecimientoAnualVivienda" @bind-Value:after="() => RecalculateAndSave()" Min="0.00" Max="10.00" Step="0.25" Class="my-4" />
+                        <MudNumericField T="decimal" Value="calculated.PrecioVentaEstimado" Label="Precio de Venta Estimado" ReadOnly="true" Variant="Variant.Filled" Format="C0" Culture="es" />
+                        <MudExpansionPanels MultiExpansion="true" Class="mt-4">
+                            <MudExpansionPanel Text="Hipoteca">
+                                <MudNumericField @bind-Value="inputs.AnosHipoteca" @bind-Value:after="() => RecalculateAndSave()" Label="Años de Hipoteca" Variant="Variant.Outlined" />
+                                <MudNumericField @bind-Value="inputs.TipoInteresAnual" @bind-Value:after="() => RecalculateAndSave()" Label="Tipo de Interés Anual (%)" Variant="Variant.Outlined" Format="F2" />
+                                <MudSlider @bind-Value="inputs.TipoInteresAnual" @bind-Value:after="() => RecalculateAndSave()" Min="0.00" Max="10.00" Step="0.10" Class="my-2" />
+                                <MudSimpleTable Dense="true" Class="mt-2"><tbody><tr><td>Importe del Préstamo</td><td style="text-align: right;">@calculated.ImportePrestamo.ToString( "C0", es )</td></tr><tr><td>Pago Mensual Hipoteca</td><td style="text-align: right;">@calculated.PagoMensualHipoteca.ToString( "C0", es )</td></tr></tbody></MudSimpleTable>
+                            </MudExpansionPanel>
+                            <MudExpansionPanel Text="Costes">
+                                <MudNumericField @bind-Value="inputs.CostesCompra" @bind-Value:after="() => RecalculateAndSave()" Label="Costes de Compra (%)" Variant="Variant.Outlined" Format="F2" />
+                                <MudSlider @bind-Value="inputs.CostesCompra" @bind-Value:after="() => RecalculateAndSave()" Min="0.00" Max="20.00" Step="0.5" Class="my-2" />
+                                <MudNumericField @bind-Value="inputs.CostesVenta" @bind-Value:after="() => RecalculateAndSave()" Label="Costes de Venta (%)" Variant="Variant.Outlined" Format="F2" />
+                                <MudSlider @bind-Value="inputs.CostesVenta" @bind-Value:after="() => RecalculateAndSave()" Min="0.00" Max="20.00" Step="0.5" Class="my-2" />
+                                <MudSimpleTable Dense="true" Class="mt-2">
+                                    <tbody>
+                                        <tr><td>Costes Totales de Compra</td><td style="text-align: right;">@calculated.CostesTotalesCompra.ToString( "C0", es )</td></tr>
+                                        <tr>
+                                            <td>Costes Totales de Venta</td>
+                                            <td style="text-align: right;">@calculated.CostesTotalesVenta.ToString( "C0", es )</td>
+                                        </tr>
+                                    </tbody>
+                                </MudSimpleTable>
+                            </MudExpansionPanel>
+                            <MudExpansionPanel Text="Rendimiento Alquiler">
+                                <MudCheckBox @bind-Value="inputs.IncluirRendimientoAlquiler" @bind-Value:after="() => RecalculateAndSave()" Label="Incluir Rendimiento del Alquiler en los Cálculos" Class="mb-4" />
+                                <MudNumericField @bind-Value="inputs.RendimientoAlquilerPrimerAno" @bind-Value:after="() => RecalculateAndSave()" Label="Rendimiento 1er Año (%)" Variant="Variant.Outlined" Format="F2" Disabled="@(!inputs.IncluirRendimientoAlquiler)" />
+                                <MudSlider @bind-Value="inputs.RendimientoAlquilerPrimerAno" @bind-Value:after="() => RecalculateAndSave()" Min="0.00" Max="10.00" Step="0.25" Class="my-2" Disabled="@(!inputs.IncluirRendimientoAlquiler)" />
+                                <MudNumericField T="decimal" Value="calculated.IngresoMensualAlquiler" Label="Ingreso Mensual por Alquiler" ReadOnly="true" Variant="Variant.Filled" Format="C0" Culture="es" Disabled="@(!inputs.IncluirRendimientoAlquiler)" />
+                            </MudExpansionPanel>
+                            @if ( calculated.ValorRestanteEnBolsa > 0 )
+                            {
+                                <MudExpansionPanel Text="Rendimiento Bolsa (restante)">
+                                    <MudSimpleTable Dense="true" Class="mt-2">
+                                        <tbody>
+                                            <tr><td>Inversión Inicial (Restante)</td><td style="text-align: right;">@((inputs.InversionInicial - inputs.Entrada).ToString( "C0", es ))</td></tr>
+                                            <tr><td>Valor Final Cartera (Bruto)</td><td style="text-align: right;">@calculated.ValorRestanteEnBolsa.ToString( "C0", es )</td></tr>
+                                            <tr><td>Impuestos Plusvalías (Restante)</td><td style="text-align: right;">@calculated.CosteImpuestosPlusvaliasRestante.ToString( "C0", es )</td></tr>
+                                        </tbody>
+                                    </MudSimpleTable>
+                                </MudExpansionPanel>
+                            }
+                        </MudExpansionPanels>
+                    </MudTabPanel>
+
+                    <MudTabPanel Text="Bolsa">
+                        <MudNumericField Value="inputs.InversionInicial" Label="Inversión Inicial en Bolsa (Escenario único)" Variant="Variant.Filled" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Euro" Disabled="true" Format="C0" Culture="es" />
+                        <MudNumericField @bind-Value="inputs.CrecimientoAnualBolsa" @bind-Value:after="() => RecalculateAndSave()" Label="Tasa Crecimiento Anual Bolsa (%)" Variant="Variant.Outlined" Format="F2" Class="mt-4" />
+                        <MudSlider @bind-Value="inputs.CrecimientoAnualBolsa" @bind-Value:after="() => RecalculateAndSave()" Min="0.00" Max="20.00" Step="0.25" Class="my-4" />
+                        <MudNumericField T="decimal" Value="calculated.ValorCarteraBolsa" Label="Valor de la Cartera" ReadOnly="true" Variant="Variant.Filled" Format="C0" Culture="es" />
+                        <MudNumericField T="decimal" Value="calculated.CosteImpuestosPlusvalias" Label="Coste Impuestos Plusvalías (25%)" ReadOnly="true" Variant="Variant.Filled" Format="C0" Culture="es" />
+                    </MudTabPanel>
+                </MudTabs>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="7">
+            <MudPaper Class="pa-4" Elevation="1">
+                <MudText Typo="Typo.h5" GutterBottom="true">Resumen del Periodo de Inversión</MudText>
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.h6" Align="Align.Center">Escenario Inmobiliario</MudText>
+                        <MudCard Elevation="0">
+                            <MudChart ChartType="ChartType.StackedBar" ChartSeries="@RealEstateChartSeries" XAxisLabels="@XAxisLabels" Width="100%" Height="400px" ChartOptions="@RealEstateChartOptions" />
+                        </MudCard>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.h6" Align="Align.Center">Escenario Bolsa</MudText>
+                        <MudCard Elevation="0">
+                            <MudChart ChartType="ChartType.StackedBar" ChartSeries="@StockChartSeries" XAxisLabels="@XAxisLabels" Width="100%" Height="400px" ChartOptions="@StockChartOptions" />
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+                <MudPaper Elevation="3" Class="d-flex flex-column align-center justify-center mud-theme-tertiary rounded-lg pa-4 my-6">
+                    <MudText Typo="Typo.h6">Diferencia Retorno Total (Bolsa - Inmobiliaria)</MudText>
+                    <MudText Typo="Typo.h2" Style="@(calculated.DiferenciaRetornoTotal >= 0 ? "color: var(--mud-palette-white);" : "color: var(--mud-palette-error);")">
+                        @calculated.DiferenciaRetornoTotal.ToString( "C0", es )
+                    </MudText>
+                </MudPaper>
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudCard Class="mb-4">
+                            <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">Inversión Inmobiliaria</MudText></CardHeaderContent></MudCardHeader>
+                            <MudCardContent>
+                                <MudSimpleTable><tbody><tr><td>Retorno Total</td><td><MudText Typo="Typo.h6">@calculated.RetornoTotalInmobiliaria.ToString( "C0", es )</MudText></td></tr><tr><td>Flujo Caja Mensual</td><td><MudText Typo="Typo.h6" Color="@(calculated.FlujoCajaMensualInmobiliaria >= 0 ? Color.Success : Color.Error)">@calculated.FlujoCajaMensualInmobiliaria.ToString( "C0", es )</MudText></td></tr></tbody></MudSimpleTable>
+                                <MudExpansionPanels Class="mt-2">
+                                    <MudExpansionPanel Text="Desglose del Saldo Final">
+                                        <MudSimpleTable Dense="true">
+                                            <tbody>
+                                                @ListItem( true, "Precio Venta Estimado", calculated.PrecioVentaEstimado )
+                                                @ListItem( true, "Ingresos por Alquiler", calculated.IngresosTotalesAlquiler )
+                                                @ListItem( true, "Valor Bruto Bolsa (Restante)", calculated.ValorRestanteEnBolsa )
+                                                @ListItem( false, "Coste Total Intereses", calculated.CosteTotalIntereses )
+                                                @ListItem( false, "Costes de Compra", calculated.CostesTotalesCompra )
+                                                @ListItem( false, "Costes de Venta", calculated.CostesTotalesVenta )
+                                                @* MEJORADO: Añadidos ambos impuestos para total transparencia *@
+                                                @ListItem( false, "Impuestos Inmueble", calculated.CosteImpuestosPlusvaliasInmueble )
+                                                @ListItem( false, "Impuestos Bolsa (Restante)", calculated.CosteImpuestosPlusvaliasRestante )
+                                            </tbody>
+                                        </MudSimpleTable>
+                                    </MudExpansionPanel>
+                                </MudExpansionPanels>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudCard>
+                            <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">Inversión en Bolsa</MudText></CardHeaderContent></MudCardHeader>
+                            <MudCardContent>
+                                <MudSimpleTable><tbody><tr><td>Retorno Total</td><td><MudText Typo="Typo.h6">@calculated.RetornoTotalBolsa.ToString( "C0", es )</MudText></td></tr><tr><td>Flujo Caja Mensual</td><td><MudText Typo="Typo.h6" Color="@(calculated.FlujoCajaMensualBolsa >= 0 ? Color.Success : Color.Error)">@calculated.FlujoCajaMensualBolsa.ToString( "C0", es )</MudText></td></tr></tbody></MudSimpleTable>
+                                <MudExpansionPanels Class="mt-2">
+                                    <MudExpansionPanel Text="Desglose del Saldo Final">
+                                        <MudSimpleTable Dense="true"><tbody>@ListItem( true, "Valor de la Cartera", calculated.ValorCarteraBolsa ) @ListItem( false, "Impuestos Plusvalías", calculated.CosteImpuestosPlusvalias )</tbody></MudSimpleTable>
+                                    </MudExpansionPanel>
+                                </MudExpansionPanels>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private RenderFragment ListItem( bool isPositive, string label, decimal value )
+    {
+        var color = isPositive ? "color: var(--mud-palette-success);" : "color: var(--mud-palette-error);";
+        var icon = isPositive ? Icons.Material.Filled.AddCircle : Icons.Material.Filled.RemoveCircle;
+        return @<tr style="font-size: 0.9rem;"><td><MudIcon Icon="@icon" Style="@color" Class="mr-1" Size="Size.Small" /> @label</td><td style="text-align: right;">@value.ToString("C0", es)</td></tr>;
+    }
+}
+
+
+@code {
+    private InvestmentInputs inputs = new InvestmentInputs();
+    private CalculatedValues calculated = new CalculatedValues();
+    private System.Globalization.CultureInfo es = new System.Globalization.CultureInfo( "es-ES" );
+    private bool isLoading = true;
+
+    private List<ChartSeries> RealEstateChartSeries = new List<ChartSeries>();
+    private List<ChartSeries> StockChartSeries = new List<ChartSeries>();
+    private string[] XAxisLabels = Array.Empty<string>();
+
+    private ChartOptions RealEstateChartOptions = new ChartOptions { YAxisFormat = "c0", ChartPalette = new string[] { "#594AE2", "#A6A0F0", "#FF9800", "#BDBDBD" } };
+    private ChartOptions StockChartOptions = new ChartOptions { YAxisFormat = "c0", ChartPalette = new string[] { "#00C853", "#FF9800" } };
+
+    protected override async Task OnAfterRenderAsync( bool firstRender )
+    {
+        if ( firstRender )
+        {
+            var savedInputs = await localStorage.GetItemAsync<InvestmentInputs>( "investmentInputs" );
+            if ( savedInputs != null ) inputs = savedInputs;
+            isLoading = false;
+            await RecalculateAndSave( isInitialLoad: true );
+        }
+    }
+
+    private async Task SetDownPaymentPercentage( decimal percentage )
+    {
+        if ( inputs.PrecioVivienda > 0 )
+        {
+            inputs.UsarInversionInicialParaEntrada = false;
+            inputs.Entrada = Math.Round( inputs.PrecioVivienda * percentage );
+            await RecalculateAndSave();
+        }
+    }
+
+    private async Task RecalculateAndSave( bool isInitialLoad = false )
+    {
+        if ( isLoading && !isInitialLoad ) return;
+        if ( inputs.UsarInversionInicialParaEntrada ) inputs.Entrada = inputs.InversionInicial;
+        if ( !inputs.IncluirRendimientoAlquiler ) inputs.RendimientoAlquilerPrimerAno = 0;
+        Calculate();
+        if ( !isInitialLoad ) await localStorage.SetItemAsync( "investmentInputs", inputs );
+        StateHasChanged();
+    }
+
+    private void Calculate()
+    {
+        if ( inputs.PrecioVivienda > 0 )
+        {
+            var downPaymentPercentage = inputs.Entrada / inputs.PrecioVivienda;
+            if ( downPaymentPercentage < 0.1m ) { calculated.DownPaymentWarningMessage = "¡Muy arriesgado! Una entrada inferior al 10% es muy difícil de conseguir."; calculated.DownPaymentWarningSeverity = Severity.Error; }
+            else if ( downPaymentPercentage < 0.2m ) { calculated.DownPaymentWarningMessage = "Atención: Una entrada inferior al 20% puede dificultar la aprobación de la hipoteca."; calculated.DownPaymentWarningSeverity = Severity.Warning; }
+            else if ( downPaymentPercentage < 0.3m ) { calculated.DownPaymentWarningMessage = "Nota: Lo ideal es una entrada del 30% para cubrir el 20% y ~10% de gastos e impuestos."; calculated.DownPaymentWarningSeverity = Severity.Info; }
+            else { calculated.DownPaymentWarningMessage = string.Empty; }
+        }
+        else { calculated.DownPaymentWarningMessage = string.Empty; }
+
+        var realEstateNetValueData = new List<double>();
+        var realEstateLeftoverStockNetData = new List<double>();
+        var realEstateTaxesPaidData = new List<double>();
+        var realEstateTaxesExemptData = new List<double>();
+        var realEstateLeftoverTaxesData = new List<double>();
+
+        var stockMarketNetValueData = new List<double>();
+        var stockMarketTaxesData = new List<double>();
+        var yearsForChart = new List<string>();
+
+        calculated.ImportePrestamo = inputs.PrecioVivienda - inputs.Entrada;
+        calculated.PagoMensualHipoteca = FinancialMath.CalculateMonthlyMortgagePayment( calculated.ImportePrestamo, (decimal)inputs.TipoInteresAnual / 100, inputs.AnosHipoteca );
+        calculated.CostesTotalesCompra = inputs.PrecioVivienda * (decimal)inputs.CostesCompra / 100;
+        decimal ingresoMensualAlquilerInicial = (inputs.PrecioVivienda * (decimal)inputs.RendimientoAlquilerPrimerAno / 100) / 12;
+        decimal inversionRestante = Math.Max( 0, inputs.InversionInicial - inputs.Entrada );
+
+        for ( int year = 1; year <= inputs.AnosInversion; year++ )
+        {
+            // --- Escenario 1: Inmobiliaria + Resto en Bolsa ---
+            int edadAlVenderAnual = inputs.EdadActual + year;
+            decimal precioVentaEstimadoAnual = inputs.PrecioVivienda * (decimal)Math.Pow( 1 + (double)inputs.CrecimientoAnualVivienda / 100, year );
+            decimal plusvaliaInmueble = precioVentaEstimadoAnual - inputs.PrecioVivienda;
+            decimal impuestosPlusvaliaInmueble = FinancialMath.CalculateProgressiveCapitalGainsTax( plusvaliaInmueble );
+
+            bool esExento = edadAlVenderAnual >= 65 && inputs.EsViviendaHabitual;
+
+            decimal costesVentaAnuales = precioVentaEstimadoAnual * (decimal)inputs.CostesVenta / 100;
+            decimal ingresosAlquilerAnuales = FinancialMath.CalculateSimulatedRentExpense( ingresoMensualAlquilerInicial, (decimal)inputs.CrecimientoAnualAlquiler / 100, year );
+            decimal pagosHipotecaAcumulados = calculated.PagoMensualHipoteca * Math.Min( year, inputs.AnosHipoteca ) * 12;
+            decimal principalPagado = FinancialMath.CalculatePrincipalPaid( calculated.ImportePrestamo, (decimal)inputs.TipoInteresAnual / 100, inputs.AnosHipoteca, year );
+            decimal interesesPagadosAnuales = pagosHipotecaAcumulados - principalPagado;
+
+            decimal patrimonioBrutoVivienda = precioVentaEstimadoAnual + ingresosAlquilerAnuales - interesesPagadosAnuales - calculated.CostesTotalesCompra - costesVentaAnuales;
+            decimal patrimonioNetoVivienda = patrimonioBrutoVivienda - (esExento ? 0 : impuestosPlusvaliaInmueble);
+
+            decimal valorRestanteEnBolsaAnual = inversionRestante * (decimal)Math.Pow( 1 + (double)inputs.CrecimientoAnualBolsa / 100, year );
+            decimal plusvaliaRestante = valorRestanteEnBolsaAnual - inversionRestante;
+            decimal impuestosRestanteAnual = FinancialMath.CalculateProgressiveCapitalGainsTax( plusvaliaRestante );
+            decimal valorNetoRestanteEnBolsa = valorRestanteEnBolsaAnual - impuestosRestanteAnual;
+
+            decimal retornoTotalInmobiliariaAnual = patrimonioNetoVivienda + valorNetoRestanteEnBolsa;
+
+            // --- Escenario 2: Bolsa (inversión completa) ---
+            decimal valorCarteraCompletaAnual = inputs.InversionInicial * (decimal)Math.Pow( 1 + (double)inputs.CrecimientoAnualBolsa / 100, year );
+            decimal plusvaliaCarteraCompleta = valorCarteraCompletaAnual - inputs.InversionInicial;
+            decimal impuestosCarteraCompleta = FinancialMath.CalculateProgressiveCapitalGainsTax( plusvaliaCarteraCompleta );
+            decimal retornoTotalBolsaAnual = valorCarteraCompletaAnual - impuestosCarteraCompleta;
+
+            int step = Math.Max( 1, inputs.AnosInversion / 10 );
+
+            if ( year == 1 || year % step == 0 || year == inputs.AnosInversion )
+            {
+                realEstateNetValueData.Add( Math.Round( (double)patrimonioNetoVivienda ) );
+                realEstateLeftoverStockNetData.Add( Math.Round( (double)valorNetoRestanteEnBolsa ) );
+
+                if ( esExento )
+                {
+                    realEstateTaxesPaidData.Add( 0 );
+                    realEstateTaxesExemptData.Add( Math.Round( (double)impuestosPlusvaliaInmueble ) );
+                }
+                else
+                {
+                    realEstateTaxesPaidData.Add( Math.Round( (double)impuestosPlusvaliaInmueble ) );
+                    realEstateTaxesExemptData.Add( 0 );
+                }
+                realEstateLeftoverTaxesData.Add( Math.Round( (double)impuestosRestanteAnual ) );
+
+                stockMarketNetValueData.Add( Math.Round( (double)retornoTotalBolsaAnual ) );
+                stockMarketTaxesData.Add( Math.Round( (double)impuestosCarteraCompleta ) );
+                yearsForChart.Add( year.ToString() );
+            }
+
+            if ( year == inputs.AnosInversion )
+            {
+                calculated.TotalGastosAlquiler = FinancialMath.CalculateSimulatedRentExpense( inputs.AlquilerMensualAlternativo, (decimal)inputs.CrecimientoAnualAlquiler / 100, year );
+                calculated.PrecioVentaEstimado = precioVentaEstimadoAnual;
+                calculated.CostesTotalesVenta = costesVentaAnuales;
+                calculated.CosteImpuestosPlusvaliasInmueble = impuestosPlusvaliaInmueble;
+                calculated.IngresosTotalesAlquiler = ingresosAlquilerAnuales;
+                calculated.ValorRestanteEnBolsa = valorRestanteEnBolsaAnual;
+                calculated.CosteImpuestosPlusvaliasRestante = impuestosRestanteAnual;
+                calculated.RetornoTotalInmobiliaria = retornoTotalInmobiliariaAnual;
+
+                calculated.ValorCarteraBolsa = valorCarteraCompletaAnual;
+                calculated.CosteImpuestosPlusvalias = impuestosCarteraCompleta;
+                calculated.RetornoTotalBolsa = retornoTotalBolsaAnual;
+
+                calculated.DiferenciaRetornoTotal = calculated.RetornoTotalBolsa - calculated.RetornoTotalInmobiliaria;
+            }
+        }
+
+        double maxValue = 0;
+        for ( int i = 0; i < realEstateNetValueData.Count; i++ ) { maxValue = Math.Max( maxValue, realEstateNetValueData[i] + realEstateLeftoverStockNetData[i] + realEstateTaxesPaidData[i] + realEstateTaxesExemptData[i] + realEstateLeftoverTaxesData[i] ); }
+        for ( int i = 0; i < stockMarketNetValueData.Count; i++ ) { maxValue = Math.Max( maxValue, stockMarketNetValueData[i] + stockMarketTaxesData[i] ); }
+        if ( maxValue > 0 )
+        {
+            double interval = maxValue / 8.0;
+            double magnitude = Math.Pow( 10, Math.Floor( Math.Log10( interval ) ) );
+            int syncedTicks = ((int)(Math.Ceiling( interval / magnitude ) * magnitude));
+            RealEstateChartOptions.YAxisTicks = syncedTicks;
+            StockChartOptions.YAxisTicks = syncedTicks;
+        }
+
+        XAxisLabels = yearsForChart.ToArray();
+        RealEstateChartSeries = new List<ChartSeries>
+        {
+            new ChartSeries { Name = "Patrimonio Inmobiliario (Neto)", Data = realEstateNetValueData.ToArray() },
+            new ChartSeries { Name = "Resto en Bolsa (Neto)", Data = realEstateLeftoverStockNetData.ToArray() },
+            new ChartSeries { Name = "Impuestos Inmueble (Pagados)", Data = realEstateTaxesPaidData.ToArray() },
+            new ChartSeries { Name = "Impuestos Inmueble (Exentos)", Data = realEstateTaxesExemptData.ToArray() },
+            new ChartSeries { Name = "Impuestos Bolsa (Restante)", Data = realEstateLeftoverTaxesData.ToArray() },
+        };
+        StockChartSeries = new List<ChartSeries>
+        {
+            new ChartSeries { Name = "Bolsa (Neto)", Data = stockMarketNetValueData.ToArray() },
+            new ChartSeries { Name = "Impuestos Pagados", Data = stockMarketTaxesData.ToArray() },
+        };
+    }
+
+    public class InvestmentInputs
+    {
+        public decimal InversionInicial { get; set; } = 100000;
+        public int AnosInversion { get; set; } = 32;
+        public decimal AlquilerMensualAlternativo { get; set; } = 456;
+        public double CrecimientoAnualAlquiler { get; set; } = 2.00;
+        public bool UsarInversionInicialParaEntrada { get; set; } = false;
+        public decimal PrecioVivienda { get; set; } = 300000;
+        public decimal Entrada { get; set; } = 90000;
+        public double CrecimientoAnualVivienda { get; set; } = 5.40;
+        public int AnosHipoteca { get; set; } = 30;
+        public double TipoInteresAnual { get; set; } = 2.50;
+        public double CostesCompra { get; set; } = 10.00;
+        public double CostesVenta { get; set; } = 0;
+        public bool IncluirRendimientoAlquiler { get; set; } = false;
+        public double RendimientoAlquilerPrimerAno { get; set; } = 2.50;
+        public double CrecimientoAnualBolsa { get; set; } = 10.00;
+
+        public int EdadActual { get; set; } = 28;
+        public bool EsViviendaHabitual { get; set; } = true;
+    }
+
+    public class CalculatedValues
+    {
+        public decimal TotalGastosAlquiler { get; set; }
+        public decimal PrecioVentaEstimado { get; set; }
+        public decimal CostesTotalesCompra { get; set; }
+        public decimal CostesTotalesVenta { get; set; }
+        public decimal ImportePrestamo { get; set; }
+        public decimal PagoMensualHipoteca { get; set; }
+        public decimal PagosTotalesHipoteca { get; set; }
+        public decimal CosteTotalIntereses { get; set; }
+        public decimal IngresoMensualAlquiler { get; set; }
+        public decimal IngresosTotalesAlquiler { get; set; }
+        public decimal RetornoTotalInmobiliaria { get; set; }
+        public decimal FlujoCajaMensualInmobiliaria { get; set; }
+        public decimal ValorCarteraBolsa { get; set; }
+        public decimal CosteImpuestosPlusvalias { get; set; }
+        public decimal RetornoTotalBolsa { get; set; }
+        public decimal FlujoCajaMensualBolsa { get; set; }
+        public decimal DiferenciaRetornoTotal { get; set; }
+
+        // MEJORADO: Propiedades para las nuevas características
+        public decimal InversionInicialBolsaReal { get; set; }
+        public string DownPaymentWarningMessage { get; set; }
+        public Severity DownPaymentWarningSeverity { get; set; }
+
+        public decimal ValorRestanteEnBolsa { get; set; }
+        public decimal CosteImpuestosPlusvaliasRestante { get; set; }
+        public decimal CosteImpuestosPlusvaliasInmueble { get; set; }
+    }
+
+    public static class FinancialMath
+    {
+        public static decimal CalculateMonthlyMortgagePayment( decimal p, decimal r, int y ) { if ( p <= 0 || y <= 0 ) return 0; if ( r <= 0 ) return p / (y * 12); var mR = r / 12; int nP = y * 12; var mRD = (double)mR; var pD = (double)p; return (decimal)(pD * mRD * Math.Pow( 1 + mRD, nP ) / (Math.Pow( 1 + mRD, nP ) - 1)); }
+        public static decimal CalculateSimulatedRentExpense( decimal i, decimal g, int y ) { if ( i <= 0 ) return 0; decimal t = 0, c = i; for ( int m = 1; m <= y * 12; m++ ) { t += c; if ( m % 12 == 0 && m < y * 12 ) c *= (1 + g); } return t; }
+        public static decimal CalculatePrincipalPaid( decimal p, decimal r, int lY, int cY ) { if ( p <= 0 ) return p; if ( cY == 0 ) return 0; var mP = CalculateMonthlyMortgagePayment( p, r, lY ); if ( mP <= 0 ) return 0; decimal remB = p, mR = r / 12; int tM = Math.Min( cY * 12, lY * 12 ); for ( int i = 0; i < tM; i++ ) { decimal intr = remB * mR; remB -= (mP - intr); } return p - Math.Max( 0, remB ); }
+
+        public static decimal CalculateProgressiveCapitalGainsTax( decimal capitalGain )
+        {
+            if ( capitalGain <= 0 ) return 0;
+
+            decimal tax = 0;
+            decimal remainingGain = capitalGain;
+
+            // Tramo 1: hasta 6.000 € al 19%
+            decimal bracket1Amount = Math.Min( remainingGain, 6000m );
+            tax += bracket1Amount * 0.19m;
+            remainingGain -= bracket1Amount;
+
+            // Tramo 2: de 6.000 € a 50.000 € al 21%
+            if ( remainingGain > 0 )
+            {
+                decimal bracket2Amount = Math.Min( remainingGain, 44000m );
+                tax += bracket2Amount * 0.21m;
+                remainingGain -= bracket2Amount;
+            }
+
+            // Tramo 3: de 50.000 € a 200.000 € al 23%
+            if ( remainingGain > 0 )
+            {
+                decimal bracket3Amount = Math.Min( remainingGain, 150000m );
+                tax += bracket3Amount * 0.23m;
+                remainingGain -= bracket3Amount;
+            }
+
+            // Tramo 4: de 200.000 € a 300.000 € al 27%
+            if ( remainingGain > 0 )
+            {
+                decimal bracket4Amount = Math.Min( remainingGain, 100000m );
+                tax += bracket4Amount * 0.27m;
+                remainingGain -= bracket4Amount;
+            }
+
+            // Tramo 5: a partir de 300.000 € al 28%
+            if ( remainingGain > 0 )
+            {
+                tax += remainingGain * 0.28m;
+            }
+
+            return tax;
+        }
+    }
+}
