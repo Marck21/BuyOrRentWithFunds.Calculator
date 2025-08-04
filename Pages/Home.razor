@@ -46,8 +46,6 @@
 
                     <MudTabPanel Text="Inmobiliaria">
                         <MudCheckBox @bind-Value="inputs.UsarInversionInicialParaEntrada" @bind-Value:after="() => RecalculateAndSave()" Label="Usar Inversión Inicial como Aportación" Class="mb-2" />
-                        <MudNumericField @bind-Value="inputs.Entrada" @bind-Value:after="() => RecalculateAndSave()" Label="Aportación Inicial (Efectivo)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Euro" Disabled="inputs.UsarInversionInicialParaEntrada" HelperText="Dinero total que aportas (cubre costes + entrada de la hipoteca)." />
-                        <MudSlider @bind-Value="inputs.Entrada" @bind-Value:after="() => RecalculateAndSave()" Min="10000" Max="250000" Class="my-4" Disabled="inputs.UsarInversionInicialParaEntrada" />
                         <div class="my-2">
                             <MudButtonGroup Variant="Variant.Outlined" FullWidth="true" OverrideStyles="false">
                                 <MudButton OnClick="@(() => SetDownPaymentPercentage(0.10m))">10%</MudButton>
@@ -55,6 +53,8 @@
                                 <MudButton OnClick="@(() => SetDownPaymentPercentage(0.30m))">30%</MudButton>
                             </MudButtonGroup>
                         </div>
+                        <MudNumericField @bind-Value="inputs.Entrada" @bind-Value:after="() => RecalculateAndSave()" Label="Aportación Inicial (Efectivo)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Euro" Disabled="inputs.UsarInversionInicialParaEntrada" HelperText="Dinero total que aportas (cubre costes + entrada de la hipoteca)." />
+                        @* <MudSlider @bind-Value="inputs.Entrada" @bind-Value:after="() => RecalculateAndSave()" Min="10000" Max="250000" Class="my-4" Disabled="inputs.UsarInversionInicialParaEntrada" /> *@
                         <MudAlert Severity="@calculated.DownPaymentWarningSeverity" ShowCloseIcon="false" Class="mb-4" Dense="true" Hidden="@(string.IsNullOrEmpty(calculated.DownPaymentWarningMessage))">
                             @((MarkupString)calculated.DownPaymentWarningMessage)
                         </MudAlert>
@@ -231,9 +231,9 @@
     {
         if ( inputs.PrecioVivienda > 0 )
         {
-            decimal purchaseCosts = (inputs.PrecioVivienda * ((decimal)inputs.CostesCompra / 100)) + inputs.GastosFijosCompra;
-            decimal totalHouseCost = inputs.PrecioVivienda + purchaseCosts;
-            decimal totalCashOutlay = totalHouseCost * percentage;
+            // decimal purchaseCosts = (inputs.PrecioVivienda * ((decimal)inputs.CostesCompra / 100)) + inputs.GastosFijosCompra;
+            // decimal totalHouseCost = inputs.PrecioVivienda + purchaseCosts;
+            decimal totalCashOutlay = calculated.CosteTotalVivienda * percentage;
 
             inputs.UsarInversionInicialParaEntrada = false;
             inputs.Entrada = Math.Round( totalCashOutlay );
@@ -260,7 +260,7 @@
 
         if ( inputs.PrecioVivienda > 0 )
         {
-            var contributionPercentage = inputs.Entrada / calculated.CosteTotalVivienda;
+            var contributionPercentage = calculated.EntradaNeta / calculated.CosteTotalVivienda;
             string baseMessage = $"Tu aportación equivale al <strong>{contributionPercentage:P1}</strong> del coste total. ";
 
             if ( calculated.EntradaNeta < 0 )
@@ -297,8 +297,8 @@
         var stockMarketTaxesData = new List<double>();
         var yearsForChart = new List<string>();
 
-        calculated.ImportePrestamo = inputs.PrecioVivienda - Math.Max( 0, calculated.EntradaNeta );
-        calculated.PorcentajeFinanciacion = (inputs.PrecioVivienda > 0) ? calculated.ImportePrestamo / inputs.PrecioVivienda : 0;
+        calculated.ImportePrestamo = calculated.CosteTotalVivienda - Math.Max( 0, calculated.EntradaNeta );
+        calculated.PorcentajeFinanciacion = (calculated.CosteTotalVivienda > 0) ? calculated.ImportePrestamo / calculated.CosteTotalVivienda : 0;
         calculated.PagoMensualHipoteca = FinancialMath.CalculateMonthlyMortgagePayment( calculated.ImportePrestamo, (decimal)inputs.TipoInteresAnual / 100, inputs.AnosHipoteca );
 
         decimal inversionRestante = Math.Max( 0, inputs.InversionInicial - inputs.Entrada );
