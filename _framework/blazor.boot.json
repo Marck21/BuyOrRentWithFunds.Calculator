@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "BuyOrRentWithFunds.Calculator",
   "resources": {
-    "hash": "sha256-fMpuUxXMC0EpY9+02SO01//pZT7td82Ns6IEbyjbH3k=",
+    "hash": "sha256-q+yZqOS+sFtm0qcVAJRAIYucNJVL0lI7YJs4D08QpF8=",
     "fingerprinting": {
       "Blazored.LocalStorage.12n6dz54qr.wasm": "Blazored.LocalStorage.wasm",
       "Microsoft.AspNetCore.Components.l51t3ywjli.wasm": "Microsoft.AspNetCore.Components.wasm",
@@ -46,7 +46,7 @@
       "System.Threading.cy526l72bt.wasm": "System.Threading.wasm",
       "System.t8xd33e5pv.wasm": "System.wasm",
       "System.Private.CoreLib.ub2047whqu.wasm": "System.Private.CoreLib.wasm",
-      "BuyOrRentWithFunds.Calculator.hlbk5clkwm.wasm": "BuyOrRentWithFunds.Calculator.wasm",
+      "BuyOrRentWithFunds.Calculator.k9cgqgscmv.wasm": "BuyOrRentWithFunds.Calculator.wasm",
       "dotnet.js": "dotnet.js",
       "dotnet.native.50iqa8w3ys.js": "dotnet.native.js",
       "dotnet.native.pk43x8e436.wasm": "dotnet.native.wasm",
@@ -115,7 +115,7 @@
       "System.Text.RegularExpressions.jec8s9wgcu.wasm": "sha256-y1CN5ibztU8h9CpKezQoacT3CYMXrtHmEx6DKWbtUwA=",
       "System.Threading.cy526l72bt.wasm": "sha256-XEsgkzB/5E/EJIekQAKL/++ZBvHe055n9Zo6Q2Ce2Zo=",
       "System.t8xd33e5pv.wasm": "sha256-jdi196RMQvJqOZVnwRK7DGSWJifChhgNljcOjGeHSUY=",
-      "BuyOrRentWithFunds.Calculator.hlbk5clkwm.wasm": "sha256-tZx/SmLag/5WUzGlXM/3zuSIFutcBvZxhBQLAJJLL1o="
+      "BuyOrRentWithFunds.Calculator.k9cgqgscmv.wasm": "sha256-6ANtiJ2uwUHxXoBWPviYJX1V+vnSQJEGGXH9VoabxUw="
     }
   },
   "cacheBootResources": true,
